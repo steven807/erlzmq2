@@ -392,6 +392,7 @@ NIF(erlzmq_nif_setsockopt)
   ErlNifUInt64 value_uint64;
   ErlNifSInt64 value_int64;
   ErlNifBinary value_binary;
+  uint8_t z85_str[41];
   int value_int;
   void *option_value;
   size_t option_len;
@@ -452,12 +453,21 @@ NIF(erlzmq_nif_setsockopt)
       if (! enif_inspect_iolist_as_binary(env, argv[2], &value_binary)) {
         return enif_make_badarg(env);
       }
-      if (value_binary.size != 40 && value_binary.size != 32) {
+      if (value_binary.size == 32) {
+        // binary
+        option_value = value_binary.data;
+        option_len = value_binary.size;
+      } else if (value_binary.size == 40) {
+        // z85-encoded
+        memcpy(z85_str, value_binary.data, 40);
+        z85_str[40] = 0;
+        option_value = z85_str;
+        option_len = 40;
+      } else {
         // XXX Perhaps should give reason for failure
         return enif_make_badarg(env);
       }
-      option_value = value_binary.data;
-      option_len = value_binary.size;
+
       break;
     default:
       return enif_make_badarg(env);
