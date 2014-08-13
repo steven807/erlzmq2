@@ -450,7 +450,7 @@ curve_keypair() ->
 %% <a href="http://api.zeromq.org/4-1:zmq-z85-decode">zmq_z85_decode</a>.</i>
 %% @end
 -spec z85_decode(binary()) ->
-    {ok, binary(), binary()} |
+    {ok, binary()} |
     erlzmq_error().
 z85_decode(Z85) ->
     erlzmq_nif:z85_decode(Z85).
